@@ -110,10 +110,7 @@
 
 
 <script>
-
-
-
-    d3.json("test.json").then(function(data) {
+    d3.json("/data/UserOverlapDataPrepaired.json").then(function(data) {
         console.log(data);
 
         // Specify the dimensions of the chart.
@@ -205,6 +202,37 @@
             event.subject.fy = null;
         }
 
+        const selectedNodeText = svg.append("text")
+        .attr("x", 10)
+        .attr("y", 20)
+        .attr("font-size", "14px")
+        .attr("fill", "black")
+        .text("");
+    
+        // Define a function to handle node click events
+        function handleNodeClick(event, node, svg) {
+            // Retrieve the selected node's ID
+            const selectedNodeId = node.id;
+        
+            // Update the text to display the name of the selected node
+            selectedNodeText.text(`Selected Node: ${selectedNodeId}`);
+        
+            // Filter links to find connected links
+            const connectedLinks = links.filter(link => link.source.id === selectedNodeId || link.target.id === selectedNodeId);
+        
+            // Highlight connected links
+            svg.selectAll("line")
+            .attr("stroke-opacity", d => connectedLinks.includes(d) ? 1 : 0.2);
+        
+            // Highlight connected nodes (source and target)
+            svg.selectAll("circle")
+            .attr("fill-opacity", d => d.id === selectedNodeId ? 1 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 1 : 0.2);
+        }
+    
+        // Add event listeners to nodes
+        svg.selectAll("circle")
+            .on("click", (event, d) => handleNodeClick(event, d, svg));
+
         // When this cell is re-run, stop the previous simulation. (This doesn’t
         // really matter since the target alpha is zero and the simulation will
         // stop naturally, but it’s a good practice.)
@@ -213,12 +241,6 @@
         // svg.node();
 
     });
-
-
-
-
-
-
 
     // var parsed_data;
     //
@@ -233,8 +255,6 @@
     //         console.log(parsed_data.data);
     //     }
     // });
-
-
 
     function collapsPanels(idOfButton, idOfPanel) {
         $(idOfButton).click(function () {
