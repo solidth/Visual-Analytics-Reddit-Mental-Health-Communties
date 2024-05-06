@@ -81,6 +81,7 @@
         </div>
         <div class="bg-light col p-5">
             <h1>Test</h1>
+            <div id="myPlot"></div>
             <div>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lacus laoreet non curabitur gravida. Aliquet sagittis id consectetur purus ut faucibus pulvinar elementum. Mattis nunc sed blandit libero volutpat sed cras ornare. Vitae tempus quam pellentesque nec nam aliquam sem. Velit ut tortor pretium viverra suspendisse potenti nullam ac. Fringilla ut morbi tincidunt augue interdum velit. Gravida dictum fusce ut placerat orci nulla pellentesque dignissim enim. At quis risus sed vulputate odio ut. Fames ac turpis egestas integer eget aliquet. Ultricies mi eget mauris pharetra. Auctor augue mauris augue neque gravida. At elementum eu facilisis sed odio morbi. Sit amet aliquam id diam. Sit amet cursus sit amet dictum sit amet justo donec. Cursus risus at ultrices mi. Et netus et malesuada fames ac. Senectus et netus et malesuada fames.
 
@@ -113,11 +114,18 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <!--<script type="module" src="js/papaparse.js"></script>-->
 <script type="text/javascript" src="js/jquery.csv.js"></script>
+<script src="//d3js.org/d3.v3.min.js"></script>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.js"></script>
 
 
 <script>
+
+    d3.select("myPlot").append("p").text("Hello World!");
+
+    console.log(d3);
+
+
 
     var parsed_data;
 
