@@ -81,18 +81,8 @@
         </div>
         <div class="bg-light col p-5">
             <h1>Test</h1>
-            <div id="myPlot"></div>
-            <div>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lacus laoreet non curabitur gravida. Aliquet sagittis id consectetur purus ut faucibus pulvinar elementum. Mattis nunc sed blandit libero volutpat sed cras ornare. Vitae tempus quam pellentesque nec nam aliquam sem. Velit ut tortor pretium viverra suspendisse potenti nullam ac. Fringilla ut morbi tincidunt augue interdum velit. Gravida dictum fusce ut placerat orci nulla pellentesque dignissim enim. At quis risus sed vulputate odio ut. Fames ac turpis egestas integer eget aliquet. Ultricies mi eget mauris pharetra. Auctor augue mauris augue neque gravida. At elementum eu facilisis sed odio morbi. Sit amet aliquam id diam. Sit amet cursus sit amet dictum sit amet justo donec. Cursus risus at ultrices mi. Et netus et malesuada fames ac. Senectus et netus et malesuada fames.
+            <svg id="myPlot" style="width:500px;height:500px"></svg>
 
-                Cras adipiscing enim eu turpis egestas pretium. Consequat id porta nibh venenatis cras sed felis eget velit. Imperdiet sed euismod nisi porta lorem. Ut eu sem integer vitae justo eget magna fermentum iaculis. Condimentum lacinia quis vel eros donec ac odio tempor orci. Quis hendrerit dolor magna eget est lorem ipsum dolor. Velit scelerisque in dictum non consectetur a erat. Mi bibendum neque egestas congue. Amet massa vitae tortor condimentum lacinia quis. Phasellus egestas tellus rutrum tellus pellentesque. Eu tincidunt tortor aliquam nulla facilisi cras fermentum. Turpis egestas sed tempus urna et pharetra pharetra massa massa. Pretium nibh ipsum consequat nisl vel. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu. Sapien pellentesque habitant morbi tristique senectus et netus et.
-
-                Arcu dui vivamus arcu felis bibendum ut. Tempor orci eu lobortis elementum nibh tellus molestie. Commodo nulla facilisi nullam vehicula ipsum a arcu cursus. At lectus urna duis convallis convallis tellus id interdum velit. A arcu cursus vitae congue mauris rhoncus aenean vel. Est ultricies integer quis auctor elit sed vulputate mi. Pellentesque habitant morbi tristique senectus et netus et malesuada. Eget nunc lobortis mattis aliquam faucibus purus in. Id semper risus in hendrerit. Ut eu sem integer vitae justo. Sed sed risus pretium quam. Facilisis mauris sit amet massa vitae tortor condimentum lacinia quis. Lobortis feugiat vivamus at augue eget arcu. Id aliquet risus feugiat in ante metus. Enim neque volutpat ac tincidunt vitae. Integer enim neque volutpat ac. Faucibus interdum posuere lorem ipsum dolor. Aliquet nibh praesent tristique magna sit amet purus gravida quis. Ullamcorper sit amet risus nullam eget felis eget.
-
-                Arcu felis bibendum ut tristique et egestas quis. Lorem ipsum dolor sit amet consectetur adipiscing elit. Vehicula ipsum a arcu cursus vitae congue mauris rhoncus. Augue mauris augue neque gravida in fermentum. Nisl purus in mollis nunc sed id semper. Euismod in pellentesque massa placerat. Nulla facilisi etiam dignissim diam quis enim lobortis scelerisque. Rutrum tellus pellentesque eu tincidunt tortor aliquam nulla. Libero id faucibus nisl tincidunt eget nullam non. Fringilla phasellus faucibus scelerisque eleifend donec.
-
-                Convallis aenean et tortor at risus viverra adipiscing at in. Non consectetur a erat nam at lectus. Vitae congue mauris rhoncus aenean vel elit. Phasellus faucibus scelerisque eleifend donec pretium. Quam elementum pulvinar etiam non quam lacus suspendisse faucibus. Sed felis eget velit aliquet sagittis. Mattis ullamcorper velit sed ullamcorper morbi. Rhoncus est pellentesque elit ullamcorper dignissim cras tincidunt. Diam ut venenatis tellus in metus vulputate eu scelerisque. Consequat mauris nunc congue nisi vitae suscipit. Nullam ac tortor vitae purus faucibus. Purus faucibus ornare suspendisse sed nisi lacus sed. A pellentesque sit amet porttitor eget dolor morbi non arcu. Nunc scelerisque viverra mauris in aliquam sem fringilla. Quam quisque id diam vel quam elementum. Integer vitae justo eget magna.
-            </div>
 
         </div>
         <div class=" p-3 text-bg-dark col-2">
@@ -114,32 +104,135 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <!--<script type="module" src="js/papaparse.js"></script>-->
 <script type="text/javascript" src="js/jquery.csv.js"></script>
-<script src="//d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="js/d3.v7.js"></script>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.js"></script>
 
 
 <script>
 
-    d3.select("myPlot").append("p").text("Hello World!");
-
-    console.log(d3);
 
 
+    d3.json("test.json").then(function(data) {
+        console.log(data);
 
-    var parsed_data;
+        // Specify the dimensions of the chart.
+        const width = 500;
+        const height = 500;
 
-    Papa.parse("submissions_preprocessed_reduced.csv", {
-        download: true,
-        header: true,
-        delimiter: ",",
-        linebreak: "\n",
-        complete: function (results) {
-            // Save result in a globally accessible var
-            parsed_data = results;
-            console.log(parsed_data.data);
+        // Specify the color scale.
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        // The force simulation mutates links and nodes, so create a copy
+        // so that re-evaluating this cell produces the same result.
+        const links = data.links.map(d => ({...d}));
+        const nodes = data.nodes.map(d => ({...d}));
+
+        // Create a simulation with several forces.
+        const simulation = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(links).id(d => d.id))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .on("tick", ticked);
+
+        // Create the SVG container.
+        const svg = d3.select("#myPlot")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("viewBox", [0, 0, width, height])
+            .attr("style", "max-width: 100%; height: auto;");
+
+
+        // Add a line for each link, and a circle for each node.
+        const link = svg.append("g")
+            .attr("stroke", "#999")
+            .attr("stroke-opacity", 0.6)
+            .selectAll()
+            .data(links)
+            .join("line")
+            .attr("stroke-width", d => Math.sqrt(d.value));
+
+        const node = svg.append("g")
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 1.5)
+            .selectAll()
+            .data(nodes)
+            .join("circle")
+            .attr("r", 5)
+            .attr("fill", d => color(d.group));
+
+        node.append("title")
+            .text(d => d.id);
+
+        // Add a drag behavior.
+        node.call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
+        //
+        // // Set the position attributes of links and nodes each time the simulation ticks.
+        function ticked() {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
         }
+
+        // Reheat the simulation when drag starts, and fix the subject position.
+        function dragstarted(event) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            event.subject.fx = event.subject.x;
+            event.subject.fy = event.subject.y;
+        }
+
+        // Update the subject (dragged node) position during drag.
+        function dragged(event) {
+            event.subject.fx = event.x;
+            event.subject.fy = event.y;
+        }
+
+        // Restore the target alpha so the simulation cools after dragging ends.
+        // Unfix the subject position now that it’s no longer being dragged.
+        function dragended(event) {
+            if (!event.active) simulation.alphaTarget(0);
+            event.subject.fx = null;
+            event.subject.fy = null;
+        }
+
+        // When this cell is re-run, stop the previous simulation. (This doesn’t
+        // really matter since the target alpha is zero and the simulation will
+        // stop naturally, but it’s a good practice.)
+        // invalidation.then(() => simulation.stop());
+
+        // svg.node();
+
     });
+
+
+
+
+
+
+
+    // var parsed_data;
+    //
+    // Papa.parse("submissions_preprocessed_reduced.csv", {
+    //     download: true,
+    //     header: true,
+    //     delimiter: ",",
+    //     linebreak: "\n",
+    //     complete: function (results) {
+    //         // Save result in a globally accessible var
+    //         parsed_data = results;
+    //         console.log(parsed_data.data);
+    //     }
+    // });
 
 
 
