@@ -81,7 +81,7 @@
         </div>
         <div class="bg-light col p-5">
             <h1>Test</h1>
-            <svg id="myPlot" style="width:500px;height:500px"></svg>
+            <svg id="myPlot" style="width:800px;height:500px"></svg><!-- TODO: Konstantin width und height umstellen -->
 
 
         </div>
@@ -110,15 +110,18 @@
 
 
 <script>
-    d3.json("/data/UserOverlapDataPrepaired.json").then(function(data) {
+    d3.json("UserOverlapData.json").then(function(data) {
         console.log(data);
 
+
         // Specify the dimensions of the chart.
-        const width = 500;
+        const width = 800; //TODO: Width und Height anpassen
         const height = 500;
 
         // Specify the color scale.
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
+        const color = d3.scaleSequential()
+            .interpolator(d3.interpolateInferno)
+            .domain([1,100]);
 
         // The force simulation mutates links and nodes, so create a copy
         // so that re-evaluating this cell produces the same result.
