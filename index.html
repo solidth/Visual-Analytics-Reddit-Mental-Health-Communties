@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="en">
-<head>
+<html lang="en" style="min-width:100vh;min-height:100vh">
+<head >
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
@@ -41,7 +41,7 @@
 </head>
 <body class="vh-100" style="overflow:hidden">
 <h1 class="bg-dark text-white mb-0 mx-auto p-4">Mental Health Subreddits</h1>
-<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Top navbar</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
@@ -71,8 +71,8 @@
     </div>
 </nav>
 
-<main class="d-flex flex-column">
-    <div class="d-flex flex-nowrap justify-content-around">
+<main class="d-flex flex-column" style="min-width:90vh;min-height:90vh">
+    <div class="d-flex flex-nowrap justify-content-around" style="min-width:100vh;min-height:100vh">
         <div class="p-3 text-bg-dark d-inline-flex col-2">
             <div id="subreddits" style="display:block">
                 <h4>Lists of Subreddits</h4>
@@ -80,16 +80,16 @@
 
                 </ul>
             </div>
-            <button type="button" id="collaps-subreddits"> <</button>
+            <button type="button" id="collaps-subreddits"> ⇤ </button>
         </div>
-        <div class="bg-light col p-5">
-            <h1>Test</h1>
-            <svg id="myPlot" style="width:800px;height:500px"></svg><!-- TODO: Konstantin width und height umstellen -->
+        <div id="visualisationArea" class="bg-light col p-5" >
+            <h1>Network</h1>
+            <svg id="myPlot" style="min-width:100%;min-height:100%"></svg>
 
 
         </div>
-        <div class=" p-3 text-bg-dark col-2">
-            <button type="button" id="collaps-filters"> <</button>
+        <div class=" p-3 text-bg-dark col-2 d-inline-flex col-2">
+            <button type="button" id="collaps-filters"> ⇥ </button>
             <div id="filters" style="display:block">
                 <h4>Filters</h4>
             </div>
@@ -98,7 +98,7 @@
     </div>
 
     <div class="text-bg-dark fixed-bottom">
-        Testiii
+        Test
     </div>
 </main>
 
@@ -118,8 +118,8 @@
 
 
         // Specify the dimensions of the chart.
-        const width = 800; //TODO: Width und Height anpassen
-        const height = 500;
+        const width = $('#myPlot').width();
+        const height = $('#myPlot').height();
 
         // Specify the color scale.
         const color = d3.scaleSequential()
@@ -135,7 +135,7 @@
         const simulation = d3.forceSimulation(nodes)
             .force("link", d3.forceLink(links).id(d => d.id))
             .force("charge", d3.forceManyBody())
-            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("center", d3.forceCenter(width / 2, height / 2.5))
             .on("tick", ticked);
 
         // Create the SVG container.
@@ -304,9 +304,21 @@
             if (content.style.display === "block") {
                 content.style.display = "none";
                 parent.removeClass("col-2");
+                if(idOfButton === '#collaps-subreddits') {
+                    $(idOfButton).html('⇥');
+                }
+                else if(idOfButton === '#collaps-filters') {
+                    $(idOfButton).html('⇤');
+                }
             } else {
                 content.style.display = "block";
-                parent.addClass("col-2")
+                parent.addClass("col-2");
+                if(idOfButton === '#collaps-subreddits') {
+                    $(idOfButton).html('⇤');
+                }
+                else if(idOfButton === '#collaps-filters') {
+                    $(idOfButton).html('⇥');
+                }
             }
         });
     }
