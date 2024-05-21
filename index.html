@@ -75,7 +75,7 @@
     <div class="d-flex flex-nowrap justify-content-around" style="min-width:100vh;min-height:100vh">
         <div class="p-3 text-bg-dark d-inline-flex col-2">
             <div id="subreddits" style="display:block">
-                <h4>Lists of Subreddits</h4>
+                <h4 style="padding:20px">Lists of Subreddits</h4>
                 <ul id="listOfSubreddits">
 
                 </ul>
@@ -91,7 +91,7 @@
         <div class=" p-3 text-bg-dark col-2 d-inline-flex col-2">
             <button type="button" id="collaps-filters"> ⇥ </button>
             <div id="filters" style="display:block">
-                <h4>Filters</h4>
+                <h4 style="padding:20px">Filters</h4>
             </div>
 
         </div>
@@ -243,11 +243,16 @@
 
             // Highlight connected links
             svg.selectAll("line")
-                .attr("stroke-opacity", d => connectedLinks.includes(d) ? 1 : 0.2);
+                .attr("stroke-opacity", d => connectedLinks.includes(d) ? 1 : 0.2)
+                .attr("stroke-width", d => connectedLinks.includes(d) ? d.value * 5 : Math.sqrt(d.value));
 
             // Highlight connected nodes (source and target)
             svg.selectAll("circle")
-                .attr("fill-opacity", d => d.id === selectedNodeId ? 1 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 1 : 0.2);
+                .attr("fill-opacity", d => d.id === selectedNodeId ? 1 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 1 : 0.2)
+                .attr("fill", d => d.id === selectedNodeId ? "red" : "black")
+                .attr("r", d => d.id === selectedNodeId ? 6 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 6 : 5)
+
+            ;
         }
 
         // Add event listeners to nodes
