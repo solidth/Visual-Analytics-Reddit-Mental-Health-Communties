@@ -154,45 +154,8 @@
             .data(links)
             .join("path")
             .attr("stroke-width", d => Math.sqrt(d.value))
-            .attr('fill', 'none')
-            //.attr('id', 'links');
+            .attr('fill', 'none');
 
-/*
-        const markerBoxWidth = 20;
-        const markerBoxHeight = 20;
-        const refX = markerBoxWidth / 2;
-        const refY = markerBoxHeight / 2;
-        const markerWidth = markerBoxWidth / 2;
-        const markerHeight = markerBoxHeight / 2;
-        const arrowPoints = [[0, 0], [0, 20], [20, 10]];
-
-        svg
-            .append('defs')
-            .append('marker')
-            .attr('id', 'arrow')
-            .attr('viewBox', [0, 0, markerBoxWidth, markerBoxHeight])
-            .attr('refX', refX)
-            .attr('refY', refY)
-            .attr('markerWidth', markerBoxWidth)
-            .attr('markerHeight', markerBoxHeight)
-            .attr('orient', 'auto-start-reverse')
-            .append('path')
-            .attr('d', d3.line()(arrowPoints))
-            .attr('stroke', 'black');
-
-        svg.append("defs").append("marker")
-            .attr('id', 'arrowhead')
-            .attr('viewBox', '-0 -5 10 10')
-            .attr("refX", 23.5)
-            .attr("refY", 0)
-            .attr('orient', 'auto')
-            .attr('markerWidth', 10)
-            .attr('markerHeight', 10)
-            .append('svg:path')
-            .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
-            .attr('fill', '#999')
-            .style('stroke', 'none');
-*/
         svg.append('defs').selectAll('marker')
             .data(['suit', 'licensing', 'resolved'])
             .enter().append('marker')
@@ -223,15 +186,8 @@
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
-        //
-        // prepare a helper function
-        /*
-        var curveFunc = d3.line()
-            .curve(d3.curveBasis)              // This is where you define the type of curve. Try curveStep for instance.
-            .x(function(c) { return c.x })
-            .y(function(c) { return c.y });
-         */
 
+        // Makes the links curved
         function linkArc(d) {
             var dx = d.target.x - d.source.x,
                 dy = d.target.y - d.source.y,
@@ -281,21 +237,11 @@
             .style("pointer-events", "none")
             .attr("startOffset", "50%")
             .text(d => d.type);
-
-
-        var text = svg.append("text")
-            .attr("x", 6)
-            .attr("dy", 15);
-
-        text.append("textPath")
-            //.attr("xlink:href","#links")
-            .text("test");
          */
 
         // // Set the position attributes of links and nodes each time the simulation ticks.
         function ticked() {
             link
-                //.attr('d', d => (d.source.x - d.target.x) < (d.target.x - d.source.x) ? curveFunc([{x : d.source.x, y : d.source.y}, {x : ((d.target.x + d.source.x) / 2) * 1.05, y : ((d.target.y + d.source.y) / 2) * 1.05}, {x : d.target.x, y : d.target.y}]) : curveFunc([{x : d.target.x, y : d.target.y}, {x : ((d.source.x + d.target.x) / 2) * 0.95, y : ((d.source.y + d.target.y) / 2) * 0.95}, {x : d.source.x, y : d.source.y}]))
                 .attr('d', d => linkArc(d));
             node
                 .attr('cx', d => d.x)
