@@ -181,6 +181,7 @@
         const text = svg.append("g")
             .attr("x", 6)
             .attr("dy", 15)
+            .attr("pointer-events", "none")
             .style('font-size', 10)
             .selectAll()
             .data(links)
