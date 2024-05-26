@@ -51,10 +51,10 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">User Overlap</a>
+                    <a class="nav-link active" aria-current="page" href="index.html">Network</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Similarity</a>
+                    <a class="nav-link" href="ipynb/heatmap_test.html">User Overlap Heatmap</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Sentiment</a>
@@ -146,15 +146,28 @@
             .attr("viewBox", [0, 0, width, height])
             .attr("style", "max-width: 100%; height: auto;");
 
-
         // Add a line for each link, and a circle for each node.
         const link = svg.append("g")
-            .attr("stroke", "#999")
+            .attr("stroke", "black")
             .attr("stroke-opacity", 0.6)
             .selectAll()
             .data(links)
-            .join("line")
-            .attr("stroke-width", d => Math.sqrt(d.value));
+            .join("path")
+            .attr("stroke-width", d => Math.sqrt(d.value))
+            .attr('fill', 'none');
+
+        svg.append('defs').selectAll('marker')
+            .data(['suit', 'licensing', 'resolved'])
+            .enter().append('marker')
+            .attr('id', 'arrow')
+            .attr('viewBox', '0 -5 10 10')
+            .attr('refX', 20)
+            .attr('refY', 0)
+            .attr('markerWidth', 6)
+            .attr('markerHeight', 6)
+            .attr('orient', 'auto')
+            .append('path')
+            .attr('d', 'M0,-5L10,0L0,5');
 
         const node = svg.append("g")
             .attr("stroke", "#fff")
@@ -165,6 +178,20 @@
             .attr("r", 5)
             .attr("fill", d => color(d.group));
 
+        const text = svg.append("g")
+            .attr("x", 6)
+            .attr("dy", 15)
+            .attr("pointer-events", "none")
+            .style('font-size', 10)
+            .selectAll()
+            .data(links)
+            .join("text")
+        text.append("textPath")
+            .attr("xlink:href",d => "#" + d.source.id + d.target.id)
+            .attr('text-anchor', 'middle')
+            .attr('startOffset', "50%")
+            .text(d => String(d.value.toFixed(2)));
+
         node.append("title")
             .text(d => d.id);
 
@@ -173,18 +200,22 @@
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
-        //
+
+        // Makes the links curved
+        function linkArc(d) {
+            var dx = d.target.x - d.source.x,
+                dy = d.target.y - d.source.y,
+                dr = Math.sqrt(dx * dx + dy * dy);
+            return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+        }
+
         // // Set the position attributes of links and nodes each time the simulation ticks.
         function ticked() {
             link
-                .attr("x1", d => d.source.x)
-                .attr("y1", d => d.source.y)
-                .attr("x2", d => d.target.x)
-                .attr("y2", d => d.target.y);
-
+                .attr('d', d => linkArc(d));
             node
-                .attr("cx", d => d.x)
-                .attr("cy", d => d.y);
+                .attr('cx', d => d.x)
+                .attr('cy', d => d.y);
         }
 
         // Reheat the simulation when drag starts, and fix the subject position.
@@ -242,9 +273,11 @@
                 .join().split(",").filter(onlyUnique).join(""));
 
             // Highlight connected links
-            svg.selectAll("line")
+            svg.selectAll("path")
                 .attr("stroke-opacity", d => connectedLinks.includes(d) ? 1 : 0.2)
-                .attr("stroke-width", d => connectedLinks.includes(d) ? d.value * 5 : Math.sqrt(d.value));
+                .attr("stroke-width", d => connectedLinks.includes(d) ? 1 : Math.sqrt(d.value))
+                .attr('marker-end', d => connectedLinks.includes(d) ? "url(#arrow)" : null)
+                .attr('id', d => connectedLinks.includes(d) ? d.source.id + d.target.id : null);
 
             // Highlight connected nodes (source and target)
             svg.selectAll("circle")
@@ -273,9 +306,11 @@
             console.log("clicki")
         });
 
+        /*
         $( "a" ).on( "click", function() {
             alert("this");
         } );
+        */
 
     });
 
