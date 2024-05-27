@@ -51,16 +51,13 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">User Overlap</a>
+                    <a class="nav-link active" aria-current="page" href="#">User Overlap Network</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Similarity</a>
+                    <a class="nav-link" href="#">User Overlap Heatmap</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Sentiment</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Hierarchies</a>
+                    <a class="nav-link" href="#">Content Similarity Heatmap</a>
                 </li>
             </ul>
             <form class="d-flex">
@@ -84,7 +81,7 @@
         </div>
         <div id="visualisationArea" class="bg-light col p-5" >
             <h1>Network</h1>
-            <svg id="myPlot" style="min-width:100%;min-height:100%"></svg>
+            <svg id="myPlot" style="min-width:100%;min-height:500px"></svg>
 
 
         </div>
@@ -92,6 +89,16 @@
             <button type="button" id="collaps-filters"> ⇥ </button>
             <div id="filters" style="display:block">
                 <h4 style="padding:20px">Filters</h4>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckCommunitySize">
+                    <label class="form-check-label" for="flexSwitchCheckCommunitySize">Show Community Size</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckSentiment">
+                    <label class="form-check-label" for="flexSwitchCheckSentiment">Show Sentiment</label>
+                </div>
+                <label for="rangeOverlapThreshold" class="form-label">Overlap threshold</label>
+                <input type="range" class="form-range" min="0" max="5" step="0.5" id="rangeOverlapThreshold">
             </div>
 
         </div>
@@ -113,7 +120,7 @@
 
 
 <script>
-    d3.json("/data/UserOverlapDataPrepaired.json").then(function (data) {
+    d3.json("/data/NetworkGraphData.json").then(function (data) {
         console.log(data);
 
 
@@ -129,7 +136,14 @@
         // The force simulation mutates links and nodes, so create a copy
         // so that re-evaluating this cell produces the same result.
         const links = data.links.map(d => ({...d}));
-        const nodes = data.nodes.map(d => ({...d}));
+        const nodesInit = data.nodes.map(d => ({...d}));
+
+        for (let node of nodesInit){
+            console.log(getNLargestElementsWithFilter(nodesInit[node],5));
+
+        }
+
+
 
         // Create a simulation with several forces.
         const simulation = d3.forceSimulation(nodes)
@@ -237,8 +251,8 @@
 
             $("#listOfSubreddits").html(connectedLinks
                 .map((obj) =>
-                    ["<li id='" + obj.target.id + "'><a href='#'>" + obj.target.id + "</a></li>",
-                        "<li id='" + obj.source.id + "'><a href='#'>" + obj.source.id + "</a></li>"])
+                    ["<li id='" + obj.target.id + "'><a class='nav-link' target='_blank' href='" + obj.target.link + "'>" + obj.target.id + "</a></li>",
+                        "<li id='" + obj.source.id + "'><a class='nav-link' target='_blank' href='" + obj.source.link + "'>" + obj.source.id + "</a></li>"])
                 .join().split(",").filter(onlyUnique).join(""));
 
             // Highlight connected links
@@ -250,9 +264,8 @@
             svg.selectAll("circle")
                 .attr("fill-opacity", d => d.id === selectedNodeId ? 1 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 1 : 0.2)
                 .attr("fill", d => d.id === selectedNodeId ? "red" : "black")
-                .attr("r", d => d.id === selectedNodeId ? 6 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 6 : 5)
+                .attr("r", d => d.id === selectedNodeId ? 6 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 6 : 5);
 
-            ;
         }
 
         // Add event listeners to nodes
@@ -269,15 +282,19 @@
 
         // svg.node();
 
-        $("li").on("click", function(){
-            console.log("clicki")
-        });
 
-        $( "a" ).on( "click", function() {
-            alert("this");
-        } );
 
     });
+
+    function getNLargestElementsWithFilter(arr, n) {
+        const largestElements = [];
+        for (let i = 0; i < n; i++) {
+            const max = Math.max(arr);
+            largestElements.push(max);
+            arr = arr.filter((num) => num !== max);
+        }
+        return largestElements;
+    }
 
 
 
