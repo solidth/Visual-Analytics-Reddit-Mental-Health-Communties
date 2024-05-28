@@ -43,7 +43,6 @@
 <h1 class="bg-dark text-white mb-0 mx-auto p-4">Mental Health Subreddits</h1>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Top navbar</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -51,22 +50,15 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="../index.html">Network</a>
+                    <a class="nav-link" aria-current="page" href="../index.html">Community Network</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="heatmap_test.html">User Overlap Heatmap</a>
+                    <a class="nav-link active" href="heatmap_test.html">User Overlap Heatmap</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Sentiment</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Hierarchies</a>
+                    <a class="nav-link" href="#">Content Similarity Heatmap</a>
                 </li>
             </ul>
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
         </div>
     </div>
 </nav>
@@ -82,6 +74,26 @@
         </div>
         <div id="visualisation" class="bg-light col p-5" style="text-align:center">
             <svg id="my_dataviz" style="min-width:100vh;min-height:100vh"></svg>
+        </div>
+        <div class=" p-3 text-bg-dark col-2 d-inline-flex col-2">
+            <div id="filters" style="display:block">
+                <h4 style="padding:20px">Filters</h4>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckText">
+                    <label class="form-check-label" for="flexSwitchCheckText">Show Sentiment</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckCommunitySize">
+                    <label class="form-check-label" for="flexSwitchCheckCommunitySize">Show Community Size</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckSentiment">
+                    <label class="form-check-label" for="flexSwitchCheckSentiment">Show Values at click</label>
+                </div>
+                <label for="rangeOverlapThreshold" class="form-label">Overlap threshold</label>
+                <input type="range" class="form-range" min="0" max="5" step="0.5" id="rangeOverlapThreshold">
+            </div>
+
         </div>
     </div>
 
@@ -162,7 +174,8 @@ function drawHeatmap(data) {
 
   // Build color scale
   var myColor = d3.scaleSequential()
-    .interpolator(d3.interpolateInferno)
+    .interpolator(d3.interpolateCubehelixDefault)
+      //interpolateMagma
     .domain([1, 0]); // Inverted domain
 
   // Create a tooltip
@@ -184,11 +197,11 @@ function drawHeatmap(data) {
       .style("stroke", "black")
       .style("opacity", 1);
     // Highlight row and column labels
-    svg.selectAll(".rowLabel").filter(function(row) { return row === d.row; }).style("font-weight", "bold").style("fill", "red").attr("visibility", "visible");
-    svg.selectAll(".colLabel").filter(function(col) { return col === d.col; }).style("font-weight", "bold").style("fill", "red").attr("visibility", "visible");
+    svg.selectAll(".rowLabel").filter(function(row) { return row === d.row; }).style("font-weight", "bold").style("fill", "black").attr("visibility", "visible");
+    svg.selectAll(".colLabel").filter(function(col) { return col === d.col; }).style("font-weight", "bold").style("fill", "black").attr("visibility", "visible");
     // Highlight corresponding cells
     svg.selectAll("rect").filter(function(cell) { return cell.row === d.row || cell.col === d.col; })
-      .style("stroke", "black").style("stroke-width", 2);
+      .style("stroke", "black").style("stroke-width", 2).style("stroke-opacity", 0.25);
   };
   var mousemove = function(d) {
     tooltip
