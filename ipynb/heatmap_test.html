@@ -1,11 +1,100 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
+<!doctype html>
+<html lang="en" style="min-width:100vh;min-height:100vh">
+<head >
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>Top navbar example · Bootstrap v5.0</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-static/">
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+
+    <!-- Favicons -->
+    <meta name="theme-color" content="#7952b3">
+
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+
+
+    <!-- Custom styles for this template -->
+    <link href="../css/navbar.css" rel="stylesheet">
+</head>
+<body class="vh-100" style="overflow:hidden">
+<h1 class="bg-dark text-white mb-0 mx-auto p-4">Mental Health Subreddits</h1>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Top navbar</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="../index.html">Network</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="heatmap_test.html">User Overlap Heatmap</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Sentiment</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Hierarchies</a>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+
+<main class="d-flex flex-column" style="min-width:90vh;min-height:90vh">
+    <div class="d-flex flex-nowrap justify-content-around" style="min-width:100vh;min-height:100vh">
+        <div class="p-3 text-bg-dark d-inline-flex col-2">
+            <div id="information" style="display:block">
+                <h4 style="padding:20px">User Overlap</h4>
+                <text> User Overlap of Mental Health Communities on Reddit depending on unique authors (community size).</text>
+            </div>
+        </div>
+        <div id="visualisation" class="bg-light col p-5" style="text-align:center">
+            <svg id="my_dataviz" style="min-width:100vh;min-height:100vh"></svg>
+        </div>
+    </div>
+
+    <div class="text-bg-dark fixed-bottom">
+        Test
+    </div>
+</main>
+
+<script type="text/javascript" src="../js/bootstrap.bundle.js"></script>
+<script type="text/javascript" src="../js/jquery.js"></script>
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
-
-<!-- Create a div where the graph will take place -->
-<div id="my_dataviz"></div>
 
 <!-- Load color palettes -->
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
@@ -25,14 +114,14 @@ function drawHeatmap(data) {
 
   // Calculate the width and height of the SVG
   var width = containerWidth - margin.left - margin.right;
-  var height = containerHeight - margin.top - margin.bottom;
+  var height = containerHeight - margin.top *0.5 - margin.bottom;
 
   // Append the svg object to the container
   var svg = svgContainer.append("svg")
     .attr("width", containerWidth)
     .attr("height", containerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + 5 + ")");
 
   // Labels of row and columns
   var myRows = Array.from(new Set(data.map(d => d.row)));
@@ -54,7 +143,8 @@ function drawHeatmap(data) {
     .style("text-anchor", "end") // Set text anchor to end so that text rotates around its end
     .attr("dx", "-.8em") // Adjust text position
     .attr("dy", ".15em") // Adjust text position
-    .attr("transform", "rotate(-45)"); // Rotate text by -45 degrees
+    .attr("transform", "rotate(-45)") // Rotate text by -45 degrees
+    .attr("visibility", "hidden");
 
   // Build Y scales and axis
   var y = d3.scaleBand()
@@ -67,6 +157,7 @@ function drawHeatmap(data) {
     .call(d3.axisLeft(y).tickSize(0));
 
   yAxis.selectAll("text")
+    .attr("visibility", "hidden")
     .attr("class", "rowLabel");
 
   // Build color scale
@@ -93,8 +184,8 @@ function drawHeatmap(data) {
       .style("stroke", "black")
       .style("opacity", 1);
     // Highlight row and column labels
-    svg.selectAll(".rowLabel").filter(function(row) { return row === d.row; }).style("font-weight", "bold").style("fill", "red");
-    svg.selectAll(".colLabel").filter(function(col) { return col === d.col; }).style("font-weight", "bold").style("fill", "red");
+    svg.selectAll(".rowLabel").filter(function(row) { return row === d.row; }).style("font-weight", "bold").style("fill", "red").attr("visibility", "visible");
+    svg.selectAll(".colLabel").filter(function(col) { return col === d.col; }).style("font-weight", "bold").style("fill", "red").attr("visibility", "visible");
     // Highlight corresponding cells
     svg.selectAll("rect").filter(function(cell) { return cell.row === d.row || cell.col === d.col; })
       .style("stroke", "black").style("stroke-width", 2);
@@ -112,8 +203,10 @@ function drawHeatmap(data) {
       .style("stroke", "none")
       .style("opacity", 0.8);
     // Remove highlight from row and column labels
-    svg.selectAll(".rowLabel").style("font-weight", "normal").style("fill", "black");
-    svg.selectAll(".colLabel").style("font-weight", "normal").style("fill", "black");
+    svg.selectAll(".rowLabel").attr("visibility", "hidden");
+    svg.selectAll(".colLabel").attr("visibility", "hidden");
+    //svg.selectAll(".rowLabel").style("font-weight", "normal").style("fill", "black");
+    //svg.selectAll(".colLabel").style("font-weight", "normal").style("fill", "black");
     // Remove highlight from corresponding cells
     svg.selectAll("rect").style("stroke", "none");
   };
@@ -136,24 +229,6 @@ function drawHeatmap(data) {
     .on("mouseover", mouseover)
     .on("mousemove", mousemove)
     .on("mouseleave", mouseleave);
-
-  // Add title to graph
-  svg.append("text")
-    .attr("x", 0)
-    .attr("y", -50)
-    .attr("text-anchor", "left")
-    .style("font-size", "22px")
-    .text("User Overlap");
-
-  // Add subtitle to graph
-  svg.append("text")
-    .attr("x", 0)
-    .attr("y", -20)
-    .attr("text-anchor", "left")
-    .style("font-size", "14px")
-    .style("fill", "grey")
-    .style("max-width", 400)
-    .text("User Overlap of Mental Health Communities on Reddit.");
 }
 
 // Load the data
