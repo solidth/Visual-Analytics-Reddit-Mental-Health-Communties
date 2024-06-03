@@ -67,7 +67,7 @@
     <div class="d-flex flex-nowrap justify-content-around" style="min-width:100vh;min-height:100vh">
         <div class="p-3 text-bg-dark d-inline-flex col-2">
             <div id="subreddits" style="display:block">
-                <h4 style="padding:20px">Lists of Subreddits</h4>
+<!--                <h4 style="padding:20px">Lists of Subreddits</h4>-->
                 <ul id="listOfSubreddits">
 
                 </ul>
@@ -82,16 +82,16 @@
             <div id="filters" style="display:block">
                 <h4 style="padding:20px">Filters</h4>
                 <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckText">
-                    <label class="form-check-label" for="flexSwitchCheckText">Show Sentiment</label>
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckSentiment" checked>
+                    <label class="form-check-label" for="flexSwitchCheckSentiment">Show Sentiment</label>
                 </div>
                 <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckCommunitySize">
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckCommunitySize" checked>
                     <label class="form-check-label" for="flexSwitchCheckCommunitySize">Show Community Size</label>
                 </div>
                 <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckSentiment">
-                    <label class="form-check-label" for="flexSwitchCheckSentiment">Show Values at click</label>
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckText" checked>
+                    <label class="form-check-label" for="flexSwitchCheckText">Show Values at click</label>
                 </div>
                 <label for="rangeOverlapThreshold" class="form-label">Overlap threshold</label>
                 <input type="range" class="form-range" min="0" max="5" step="0.5" id="rangeOverlapThreshold">
@@ -101,7 +101,7 @@
     </div>
 
     <div class="text-bg-dark fixed-bottom">
-        Test
+        Visual Analytics Groupe 20: Thomas Aumüller, Katharina Bein, Konstantin Windisch
     </div>
 </main>
 
@@ -117,13 +117,13 @@
 
 <script>
 
-    var flexSwitchCheckSentiment = false;
+    var flexSwitchCheckSentiment = true;
 
     $('#flexSwitchCheckSentiment').click(function(e) {
         flexSwitchCheckSentiment = $(this).is(":checked");
     });
 
-    d3.json("/data/UserOverlapDataPrepaired.json").then(function (data) {
+    d3.json("/data/NetworkGraphData.json").then(function (data) {
         console.log(data);
 
 
@@ -133,8 +133,8 @@
 
         // Specify the color scale.
         const color = d3.scaleSequential()
-            .interpolator(d3.interpolateInferno)
-            .domain([1, 100]);
+            .interpolator(d3.interpolateHclLong("purple", "orange"))
+            .domain([0, 1]);
 
         // The force simulation mutates links and nodes, so create a copy
         // so that re-evaluating this cell produces the same result.
@@ -160,8 +160,8 @@
             .append("svg")
             .attr("width", width)
             .attr("height", height)
-            .attr("viewBox", [0, 0, width, height])
-            .attr("style", "max-width: 100%; height: auto;");
+            // .attr("viewBox", [0, 0, width, height])
+            // .attr("style", "max-width: 100%; height: auto;");
 
 
         // Add a line for each link, and a circle for each node.
@@ -193,8 +193,28 @@
             .selectAll()
             .data(nodes)
             .join("circle")
-            .attr("r", 5)
-            .attr("fill", d => color(d.group));
+            .attr("r", function(d) { return d.size * 0.001 + 3; })
+            .attr("fill", function(d) { return color(d.sentiment_compound); });
+
+        $('#flexSwitchCheckSentiment').click(function(e) {
+            var flexSwitchCheckSentiment = $(this).is(":checked");
+            console.log(flexSwitchCheckSentiment);
+            var bool = flexSwitchCheckSentiment ? function(d) { return color(d.sentiment_compound); } : "black";
+            svg.selectAll("circle")
+                .transition()
+                .duration(200)
+                .style("fill", bool);
+
+        });  flexSwitchCheckCommunitySize
+
+        $('#flexSwitchCheckCommunitySize').click(function(e) {
+            var flexSwitchCheckCommunitySize = $(this).is(":checked");
+            var bool = flexSwitchCheckCommunitySize ? function(d) { return d.size * 0.001 + 3; } : 5;
+            svg.selectAll("circle")
+                .transition()
+                .duration(200)
+                .attr("r", bool);
+        })
 
         const text = svg.append("g")
             .attr("x", 6)
@@ -204,11 +224,24 @@
             .selectAll()
             .data(links)
             .join("text")
+
+        var flexSwitchCheckText = true;
+
         text.append("textPath")
             .attr("xlink:href",d => "#" + d.source.id + d.target.id)
             .attr('text-anchor', 'middle')
             .attr('startOffset', "50%")
+            .attr("opacity", 1)
             .text(d => String(d.value.toFixed(2)));
+
+        $('#flexSwitchCheckText').click(function(e) {
+            flexSwitchCheckText = $(this).is(":checked");
+            var bool = flexSwitchCheckText ? 1 : 0;
+            text.selectAll("textPath")
+                .transition()
+                .duration(200)
+                .attr("opacity", bool);
+        });
 
         node.append("title")
             .text(d => d.id);
@@ -218,6 +251,8 @@
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
+
+
 
         // Makes the links curved
         function linkArc(d) {
@@ -264,6 +299,21 @@
             .attr("fill", "black")
             .text("");
 
+
+        function handleZoom(e){
+            d3.select("svg g")
+                .attr("transform", e.transform);
+
+            d3.selectAll("circle")
+                .attr("transform", e.transform);
+        }
+
+        let zoom = d3.zoom()
+            .on("zoom", handleZoom)
+
+        d3.select("svg").call(zoom)
+
+
         // Define a function to handle node click events
         function handleNodeClick(event, node, svg) {
 
@@ -272,10 +322,11 @@
             
 
             // Update the text to display the name of the selected node
-            selectedNodeText.text(`Selected Node: ${selectedNodeId}`);
+            // selectedNodeText.text(`Selected Node: ${selectedNodeId}`);
 
             // Filter links to find connected links
             const connectedLinks = links.filter((link) => link.source.id === selectedNodeId || link.target.id === selectedNodeId);
+
 
             function onlyUnique(value, index, array) {
                 return array.indexOf(value) === index;
@@ -284,11 +335,17 @@
             // console.log("hier", connectedLinks);
             // console.log("hier", connectedLinks.map((obj) => ["<li id='" + obj.target.id + "'>" + obj.target.id + "</li>", "<li id='" + obj.source.id + "'>" + obj.source.id + "</li>"]).join().split(",").filter(onlyUnique));
 
-            $("#listOfSubreddits").html(connectedLinks
+            $("#listOfSubreddits").html("<h4>" + selectedNodeId + "</h4>" +
+                "<div><b>Sentiment:</b> " + node.sentiment + " (" + node.sentiment_compound + ")</div>" +
+                "<a href='" + node.link  + "'>" + node.link+ "</a>" +
+                "<div><b>Community Size: </b> " + node.size + "</div>" +
+                connectedLinks
                 .map((obj) =>
                     ["<li id='" + obj.target.id + "'><a class='nav-link' target='_blank' href='" + obj.target.link + "'>" + obj.target.id + "</a></li>",
                         "<li id='" + obj.source.id + "'><a class='nav-link' target='_blank' href='" + obj.source.link + "'>" + obj.source.id + "</a></li>"])
-                .join().split(",").filter(onlyUnique).join(""));
+                .join().split(",").filter(onlyUnique)
+                    .filter((x) => x !== "<li id='" + node.id + "'><a class='nav-link' target='_blank' href='" + node.link + "'>" + node.id + "</a></li>")
+                    .join(""));
 
             // Highlight connected links
             svg.selectAll("path")
@@ -298,12 +355,10 @@
                 .attr('id', d => connectedLinks.includes(d) ? d.source.id + d.target.id : null);
 
             // Highlight connected nodes (source and target)
-            svg.selectAll("circle")
-                .attr("fill-opacity", d => d.id === selectedNodeId ? 1 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 1 : 0.2)
-                .attr("fill", d => d.id === selectedNodeId ? "red" : "black")
-                .attr("r", d => d.id === selectedNodeId ? 6 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 6 : 5);
-
-            ;
+            // svg.selectAll("circle")
+            //     .attr("fill-opacity", d => d.id === selectedNodeId ? 1 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 1 : 0.2)
+            //     .attr("fill", d => d.id === selectedNodeId ? "red" : "black")
+            //     .attr("r", d => d.id === selectedNodeId ? 6 : connectedLinks.some(link => link.source.id === d.id || link.target.id === d.id) ? 6 : 5);
         }
 
         // Add event listeners to nodes
