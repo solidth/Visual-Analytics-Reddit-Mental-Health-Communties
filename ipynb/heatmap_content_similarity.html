@@ -53,10 +53,10 @@
                     <a class="nav-link" aria-current="page" href="../index.html">Community Network</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="heatmap_test.html">User Overlap Heatmap</a>
+                    <a class="nav-link" href="heatmap_test.html">User Overlap Heatmap</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="heatmap_content_similarity.html">Content Similarity Heatmap</a>
+                    <a class="nav-link active" href="heatmap_content_similarity.html">Content Similarity Heatmap</a>
                 </li>
             </ul>
         </div>
@@ -68,8 +68,8 @@
     <div class="d-flex flex-nowrap justify-content-around" style="min-width:100vh;min-height:100vh">
         <div class="p-3 text-bg-dark d-inline-flex col-2">
             <div id="information" style="display:block">
-                <h4 style="padding:20px">User Overlap</h4>
-                <text> User Overlap of Mental Health Communities on Reddit depending on unique authors (community size).</text>
+                <h4 style="padding:20px">Content Overlap</h4>
+                <text> Content Overlap of Mental Health Communities on Reddit depending on unique authors (community size).</text>
             </div>
         </div>
         <div id="visualisation" class="bg-light col p-5" style="text-align:center">
@@ -352,7 +352,7 @@ function drawHeatmap(data) {
 }
 
 // Load the data
-d3.json("../data/HeatmapData.json", function(data) {
+d3.json("../data/ContentSimilarityHeatmapData.json", function(data) {
   // Convert the data to an array format expected by D3
   const dataArray = Object.values(data);
   drawHeatmap(dataArray);
