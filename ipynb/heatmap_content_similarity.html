@@ -70,6 +70,7 @@
             <div id="information" style="display:block">
                 <h4 style="padding:20px">Content Overlap</h4>
                 <text> Content Overlap of Mental Health Communities on Reddit depending on unique authors (community size).</text>
+                <ul style="padding-top:40px" id="selected_information"></ul>
             </div>
         </div>
         <div id="visualisation" class="bg-light col p-5" style="text-align:center">
@@ -98,7 +99,6 @@
                     <input class="form-check-input" type="checkbox" id="color_interpolateGreys">
                     <label class="form-check-label" for="color_interpolateGreys">interpolateGreys</label>
                 </div>
-                <!--<select id="selectButton"></select>-->
             </div>
         </div>
     </div>
@@ -230,6 +230,16 @@ function drawHeatmap(data) {
     // Remove highlight from corresponding cells
     svg.selectAll("rect").style("stroke", "none");
   };
+  var tableclick = function(d) {
+    var x_label = d['col'];
+    var y_label = d['row'];
+
+
+    $("#selected_information").html("<h4>" + "Selected" + "</h4>" +
+        "<div><b>Row:</b> " + y_label + "</div>" +
+        "<div><b>Column:</b> " + x_label + "</div>" +
+        "<div><b>Value: </b> " + d['value'] + "</div>");
+  };
 
   // Add the squares
   svg.selectAll()
@@ -248,60 +258,8 @@ function drawHeatmap(data) {
     .style("opacity", 0.8)
     .on("mouseover", mouseover)
     .on("mousemove", mousemove)
-    .on("mouseleave", mouseleave);
-
-    // If dropdown menu is better
-    /*
-    // add the options to the button
-    var allGroup = ['interpolateCubehelixDefault', 'interpolateMagma', 'interpolateCividis', 'interpolateViridis', 'interpolateGreys']
-
-    d3.select("#selectButton")
-        .selectAll('myOptions')
-        .data(allGroup)
-        .enter()
-        .append('option')
-        .text(function (d) { return d; }) // text showed in the menu
-        .attr("value", function (d) { return d; }) // corresponding value returned by the button
-
-    // When the button is changed, run the updateChart function
-    d3.select("#selectButton").on("change", function(d) {
-        // recover the option that has been chosen
-        var selectedOption = d3.select(this).property("value")
-        // run the updateChart function with this selected option
-        switch (selectedOption) {
-            case 'interpolateCubehelixDefault' :
-                myColor.interpolator(d3.interpolateCubehelixDefault)
-                    .domain([1, 0]); // Inverted domain
-                svg.selectAll("rect").style("fill", function(d) { return myColor(d.value); })
-                break;
-            case 'interpolateMagma':
-                myColor.interpolator(d3.interpolateMagma)
-                    .domain([1, 0]); // Inverted domain
-                svg.selectAll("rect").style("fill", function(d) { return myColor(d.value); })
-                break;
-            case 'interpolateCividis':
-                myColor.interpolator(d3.interpolateCividis)
-                    .domain([1, 0]); // Inverted domain
-                svg.selectAll("rect").style("fill", function(d) { return myColor(d.value); })
-                break;
-            case 'interpolateViridis':
-                myColor.interpolator(d3.interpolateViridis)
-                    .domain([1, 0]); // Inverted domain
-                svg.selectAll("rect").style("fill", function(d) { return myColor(d.value); })
-                break;
-            case 'interpolateGreys':
-                myColor.interpolator(d3.interpolateGreys)
-                    .domain([0, 1]); // Inverted domain
-                svg.selectAll("rect").style("fill", function(d) { return myColor(d.value); })
-                break;
-            default:
-                myColor.interpolator(d3.interpolateCubehelixDefault)
-                    .domain([1, 0]); // Inverted domain
-                svg.selectAll("rect").style("fill", function(d) { return myColor(d.value); })
-                break;
-        }
-    })
-    */
+    .on("mouseleave", mouseleave)
+    .on("click", tableclick);
 
     $('#color_interpolateCubehelixDefault').click(function(e) {
         var $checkboxes = $("input[type='checkbox']");
