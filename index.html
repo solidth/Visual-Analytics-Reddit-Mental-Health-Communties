@@ -67,7 +67,7 @@
     <div class="d-flex flex-nowrap justify-content-around" style="min-width:100vh;min-height:100vh">
         <div class="p-3 text-bg-dark d-inline-flex col-2">
             <div id="subreddits" style="display:block">
-<!--                <h4 style="padding:20px">Lists of Subreddits</h4>-->
+                <h4 style="padding:20px">Subreddit Info</h4>
                 <ul id="listOfSubreddits">
 
                 </ul>
@@ -79,7 +79,9 @@
         </div>
         <div class=" p-3 text-bg-dark col-2 d-inline-flex col-2">
             <button type="button" id="collaps-filters"> ⇥ </button>
-            <div id="filters" style="display:block">
+            <div id="filters" style="display:block; padding:10px">
+                <h4>Color Key</h4>
+                <svg id="key"></svg>
                 <h4 style="padding:20px">Filters</h4>
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="flexSwitchCheckSentiment" checked>
@@ -93,9 +95,7 @@
                     <input class="form-check-input" type="checkbox" id="flexSwitchCheckText" checked>
                     <label class="form-check-label" for="flexSwitchCheckText">Show Values at click</label>
                 </div>
-                <label for="rangeOverlapThreshold" class="form-label">Overlap threshold</label>
-                <input type="range" class="form-range" min="0" max="5" step="0.5" id="rangeOverlapThreshold">
-            </div>
+                </div>
 
         </div>
     </div>
@@ -123,18 +123,18 @@
         flexSwitchCheckSentiment = $(this).is(":checked");
     });
 
-    d3.json("/data/NetworkGraphData.json").then(function (data) {
-        console.log(data);
+    // Specify the color scale.
+    var color = d3.scaleSequential()
+        .interpolator(d3.interpolateHclLong("purple", "orange"))
+        .domain([-1, 1]);
 
+    d3.json("/data/NetworkGraphData.json").then(function (data) {
 
         // Specify the dimensions of the chart.
         const width = $('#myPlot').width();
         const height = $('#myPlot').height();
 
-        // Specify the color scale.
-        const color = d3.scaleSequential()
-            .interpolator(d3.interpolateHclLong("purple", "orange"))
-            .domain([0, 1]);
+
 
         // The force simulation mutates links and nodes, so create a copy
         // so that re-evaluating this cell produces the same result.
@@ -306,6 +306,9 @@
 
             d3.selectAll("circle")
                 .attr("transform", e.transform);
+
+            text.selectAll("textPath")
+                .attr("transform", e.transform);
         }
 
         let zoom = d3.zoom()
@@ -376,6 +379,38 @@
         // svg.node();
 
 
+        var colorBarSvg = d3.select("#key")
+            .attr("width",100)
+            .attr("height",20);
+
+        var grad = colorBarSvg.append('defs')
+            .append('linearGradient')
+            .attr('id', 'grad')
+            .attr('x1', '0%')
+            .attr('x2', '100%')
+            .attr('y1', '0%')
+            .attr('y2', '0%');
+
+        console.log("hier", nodes.hasMin("sentiment_compound").sentiment_compound);
+        console.log("hier", nodes.hasMax("sentiment_compound").sentiment_compound);
+
+        var colorGrad = [color(nodes.hasMin("sentiment_compound").sentiment_compound), color(nodes.hasMax("sentiment_compound").sentiment_compound)];
+        grad.selectAll('stop')
+            .data(colorGrad)
+            .enter()
+            .append('stop')
+            .style('stop-color', function(d){ return d; })
+            .attr('offset', function(d,i){
+                return 100 * (i / (colorGrad.length - 1)) + '%';
+            })
+
+        colorBarSvg.append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', 100)
+            .attr('height', 20)
+            .style('fill', 'url(#grad)');
+
 
     });
 
@@ -388,6 +423,22 @@
         }
         return largestElements;
     }
+
+    Array.prototype.hasMin = function(attrib) {
+        return (this.length && this.reduce(function(prev, curr){
+            return prev[attrib] < curr[attrib] ? prev : curr;
+        })) || null;
+    }
+
+    Array.prototype.hasMax = function(attrib) {
+        return (this.length && this.reduce(function(prev, curr){
+            return prev[attrib] > curr[attrib] ? prev : curr;
+        })) || null;
+    }
+
+
+
+
 
 
 
