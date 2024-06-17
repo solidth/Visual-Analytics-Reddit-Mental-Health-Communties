@@ -112,9 +112,6 @@
 <script type="text/javascript" src="js/jquery.csv.js"></script>
 <script type="text/javascript" src="js/d3.v7.js"></script>
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.js"></script>
-
-
 <script>
 
     var flexSwitchCheckSentiment = true;
@@ -301,20 +298,20 @@
 
 
         function handleZoom(e){
-            d3.select("svg g")
-                .attr("transform", e.transform);
-
             d3.selectAll("circle")
                 .attr("transform", e.transform);
 
-            text.selectAll("textPath")
+            d3.selectAll("path")
                 .attr("transform", e.transform);
         }
+
 
         let zoom = d3.zoom()
             .on("zoom", handleZoom)
 
+
         d3.select("svg").call(zoom)
+
 
 
         // Define a function to handle node click events
@@ -390,9 +387,6 @@
             .attr('x2', '100%')
             .attr('y1', '0%')
             .attr('y2', '0%');
-
-        console.log("hier", nodes.hasMin("sentiment_compound").sentiment_compound);
-        console.log("hier", nodes.hasMax("sentiment_compound").sentiment_compound);
 
         var colorGrad = [color(nodes.hasMin("sentiment_compound").sentiment_compound), color(nodes.hasMax("sentiment_compound").sentiment_compound)];
         grad.selectAll('stop')
