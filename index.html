@@ -80,7 +80,8 @@
         <div class=" p-3 text-bg-dark col-2 d-inline-flex col-2">
             <button type="button" id="collaps-filters"> ⇥ </button>
             <div id="filters" style="display:block; padding:10px">
-                <h4>Color Key</h4>
+                <h4>Sentiment</h4>
+                <h6>Negative - Positive</h6>
                 <svg id="key"></svg>
                 <h4 style="padding:20px">Filters</h4>
                 <div class="form-check form-switch">
@@ -339,6 +340,7 @@
                 "<div><b>Sentiment:</b> " + node.sentiment + " (" + node.sentiment_compound + ")</div>" +
                 "<a href='" + node.link  + "'>" + node.link+ "</a>" +
                 "<div><b>Community Size: </b> " + node.size + "</div>" +
+                "<div><b><u>Top 5 overlapping Communities: </u></b> " +
                 connectedLinks
                 .map((obj) =>
                     ["<li id='" + obj.target.id + "'><a class='nav-link' target='_blank' href='" + obj.target.link + "'>" + obj.target.id + "</a></li>",
