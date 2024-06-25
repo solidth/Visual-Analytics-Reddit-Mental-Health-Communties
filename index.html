@@ -406,29 +406,7 @@
         })) || null;
     }
 
-
-
-
-
-
-
-
-
-    // var parsed_data;
-    //
-    // Papa.parse("submissions_preprocessed_reduced.csv", {
-    //     download: true,
-    //     header: true,
-    //     delimiter: ",",
-    //     linebreak: "\n",
-    //     complete: function (results) {
-    //         // Save result in a globally accessible var
-    //         parsed_data = results;
-    //         console.log(parsed_data.data);
-    //     }
-    // });
-
-
+    // Function call for collaping the filter and info panel
     function collapsPanels(idOfButton, idOfPanel) {
         $(idOfButton).click(function () {
             this.classList.toggle("active");
