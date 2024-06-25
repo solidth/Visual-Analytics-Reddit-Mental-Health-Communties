@@ -261,6 +261,7 @@ function drawHeatmap(data) {
     .on("mouseleave", mouseleave)
     .on("click", tableclick);
 
+    // Function call for color switching
     $('#color_interpolateCubehelixDefault').click(function(e) {
         var $checkboxes = $("input[type='checkbox']");
         $checkboxes.change(function(){

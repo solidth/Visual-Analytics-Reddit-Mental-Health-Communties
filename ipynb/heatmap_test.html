@@ -271,6 +271,7 @@ function drawHeatmap(data) {
         svg.selectAll("rect").style("fill", function(d) { return myColor(d.value); })
     });
 
+    // Function call for color switching
     $('#color_interpolateMagma').click(function(e) {
         var $checkboxes = $("input[type='checkbox']");
         $checkboxes.change(function(){
