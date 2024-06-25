@@ -132,19 +132,11 @@
         const width = $('#myPlot').width();
         const height = $('#myPlot').height();
 
-
-
         // The force simulation mutates links and nodes, so create a copy
         // so that re-evaluating this cell produces the same result.
         const links = data.links.map(d => ({...d}));
         const nodes = data.nodes.map(d => ({...d}));
-
-        // for (let node of nodesInit){
-        //     console.log(getNLargestElementsWithFilter(nodesInit[node],5));
-        //
-        // }
-
-
+        
 
         // Create a simulation with several forces.
         const simulation = d3.forceSimulation(nodes)
@@ -172,6 +164,7 @@
             .attr("stroke-width", d => Math.sqrt(d.value))
             .attr('fill', 'none');
 
+        // Add arrows to paths
         svg.append('defs').selectAll('marker')
             .data(['suit', 'licensing', 'resolved'])
             .enter().append('marker')
@@ -185,6 +178,7 @@
             .append('path')
             .attr('d', 'M0,-5L10,0L0,5');
 
+        // Add nodes with size and sentiment color
         const node = svg.append("g")
             .attr("stroke", "#fff")
             .attr("stroke-width", 1.5)
@@ -194,6 +188,7 @@
             .attr("r", function(d) { return d.size * 0.001 + 3; })
             .attr("fill", function(d) { return color(d.sentiment_compound); });
 
+        // Add Color Sentiment switch logic
         $('#flexSwitchCheckSentiment').click(function(e) {
             var flexSwitchCheckSentiment = $(this).is(":checked");
             console.log(flexSwitchCheckSentiment);
@@ -203,8 +198,9 @@
                 .duration(200)
                 .style("fill", bool);
 
-        });  flexSwitchCheckCommunitySize
+        });
 
+        // Add Size switch logic
         $('#flexSwitchCheckCommunitySize').click(function(e) {
             var flexSwitchCheckCommunitySize = $(this).is(":checked");
             var bool = flexSwitchCheckCommunitySize ? function(d) { return d.size * 0.001 + 3; } : 5;
@@ -214,6 +210,7 @@
                 .attr("r", bool);
         })
 
+        // Add taxt to paths
         const text = svg.append("g")
             .attr("x", 6)
             .attr("dy", 15)
@@ -223,7 +220,7 @@
             .data(links)
             .join("text")
 
-        var flexSwitchCheckText = true;
+
 
         text.append("textPath")
             .attr("xlink:href",d => "#" + d.source.id + d.target.id)
@@ -232,6 +229,8 @@
             .attr("opacity", 1)
             .text(d => String(d.value.toFixed(2)));
 
+        // Add Text Display switch logic
+        var flexSwitchCheckText = true;
         $('#flexSwitchCheckText').click(function(e) {
             flexSwitchCheckText = $(this).is(":checked");
             var bool = flexSwitchCheckText ? 1 : 0;
@@ -297,7 +296,7 @@
             .attr("fill", "black")
             .text("");
 
-
+        // Function calls to zoom logic
         function handleZoom(e){
             d3.selectAll("circle")
                 .attr("transform", e.transform);
@@ -320,22 +319,16 @@
 
             // Retrieve the selected node's ID
             const selectedNodeId = node.id;
-            
-
-            // Update the text to display the name of the selected node
-            // selectedNodeText.text(`Selected Node: ${selectedNodeId}`);
 
             // Filter links to find connected links
             const connectedLinks = links.filter((link) => link.source.id === selectedNodeId || link.target.id === selectedNodeId);
 
-
+            // Function call to get uniqu indices
             function onlyUnique(value, index, array) {
                 return array.indexOf(value) === index;
             }
 
-            // console.log("hier", connectedLinks);
-            // console.log("hier", connectedLinks.map((obj) => ["<li id='" + obj.target.id + "'>" + obj.target.id + "</li>", "<li id='" + obj.source.id + "'>" + obj.source.id + "</li>"]).join().split(",").filter(onlyUnique));
-
+            //Add information to index screen
             $("#listOfSubreddits").html("<h4>" + selectedNodeId + "</h4>" +
                 "<div><b>Sentiment:</b> " + node.sentiment + " (" + node.sentiment_compound + ")</div>" +
                 "<a href='" + node.link  + "'>" + node.link+ "</a>" +
@@ -367,17 +360,7 @@
         svg.selectAll("circle")
             .on("click", (event, d) => handleNodeClick(event, d, svg));
 
-        // d3.selectAll("li").on("click", (event, this.id) =>  handleNodeClick(event, this.id, svg));
-
-
-        // When this cell is re-run, stop the previous simulation. (This doesn’t
-        // really matter since the target alpha is zero and the simulation will
-        // stop naturally, but it’s a good practice.)
-        // invalidation.then(() => simulation.stop());
-
-        // svg.node();
-
-
+        //Add color bar to filter panel
         var colorBarSvg = d3.select("#key")
             .attr("width",100)
             .attr("height",20);
@@ -407,25 +390,16 @@
             .attr('height', 20)
             .style('fill', 'url(#grad)');
 
-
     });
 
-    function getNLargestElementsWithFilter(arr, n) {
-        const largestElements = [];
-        for (let i = 0; i < n; i++) {
-            const max = Math.max(arr);
-            largestElements.push(max);
-            arr = arr.filter((num) => num !== max);
-        }
-        return largestElements;
-    }
-
+    // Function call for min
     Array.prototype.hasMin = function(attrib) {
         return (this.length && this.reduce(function(prev, curr){
             return prev[attrib] < curr[attrib] ? prev : curr;
         })) || null;
     }
 
+    // Function call for max
     Array.prototype.hasMax = function(attrib) {
         return (this.length && this.reduce(function(prev, curr){
             return prev[attrib] > curr[attrib] ? prev : curr;
